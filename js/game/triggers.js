@@ -8,6 +8,12 @@ new trigger(
 	}
 ), new trigger(
 	function () {
+		return game.day == 0;
+	}, function () {
+		appendMessage("#day0night");
+	}
+), new trigger(
+	function () {
 		return game.day == 1 && game.dayTime == false;
 	}, function () {
 		appendMessage("#day1evening");

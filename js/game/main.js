@@ -5,6 +5,7 @@ function init() {
 	hide("#storage");
 	hide("#progress");
 	$(".hidden").hide();
+	setUpDialog();
 	var aux = function () {
 		eval(game.buttonAction)();
 	};
@@ -24,7 +25,7 @@ function init() {
 	game.disabledDayTime = null;
 	game.storage = {};
 	game.triggers = [];
-	game.day = 1;
+	game.day = 0;
 	game.tasks = {};
 	game.afterToggle = ["_.id", null];
 	game.activities = {};
@@ -37,24 +38,29 @@ function init() {
 	restoreSave();
 	game.radios = [];
 	setActivities();
-	setTriggers();
 }
 
+function setUpDialog() {
+//	$("#dialog").accordion();
+}
 
 function restoreSave() {
 	game = getLocalStorage("game", game);
+	setTriggers();
 	if(_.size(game.storage) > 0) {
 		toggleDayTime();
 		eval(game.afterToggle[0])(game.afterToggle[1]);
 		if(game.dayTime) startNewDay();
 		fadeIn("#storage");
-		$("#dialog").empty();
 		$("#button").hide();
-		setTriggers();
 		game.dayTime = !game.dayTime;
 		triggerEvents();
 		game.dayTime = !game.dayTime;
 		disableDayTime();
+	}
+	else {
+		triggerEvents();
+		game.day = 1;
 	}
 	if(_.size(game.tasks) > 0) {
 		fadeIn("#progress");
