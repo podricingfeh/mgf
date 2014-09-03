@@ -5,7 +5,6 @@ function init() {
 	hide("#storage");
 	hide("#progress");
 	$(".hidden").hide();
-	setUpDialog();
 	var aux = function () {
 		eval(game.buttonAction)();
 	};
@@ -41,11 +40,13 @@ function init() {
 }
 
 function setUpDialog() {
-//	$("#dialog").accordion();
+	$("#dialog").accordion();
+	appendNewDayLog();
 }
 
 function restoreSave() {
 	game = getLocalStorage("game", game);
+	setUpDialog();
 	setTriggers();
 	if(_.size(game.storage) > 0) {
 		toggleDayTime();
@@ -54,13 +55,20 @@ function restoreSave() {
 		fadeIn("#storage");
 		$("#button").hide();
 		game.dayTime = !game.dayTime;
-		triggerEvents();
+		if(! game.dayTime) {
+			game.day -= 1;
+			triggerEvents();
+			game.day += 1;
+		}
+		else {
+			triggerEvents();
+		}
 		game.dayTime = !game.dayTime;
 		disableDayTime();
 	}
 	else {
 		triggerEvents();
-		game.day = 1;
+		startNewDay();
 	}
 	if(_.size(game.tasks) > 0) {
 		fadeIn("#progress");
@@ -87,11 +95,12 @@ function trigger(condition, action) {
 }
 
 function firstDay() {
-	$("#button").fadeOut(400, startDay);
+	$("#button").fadeOut(400, firstDayAux);
 	game.buttonAction = "_.id";
 }
 
-function startDay() {
+function firstDayAux() {
+	appendNewDayLog();
 	triggerEvents();
 	toggleDayTime();
 }
@@ -121,6 +130,7 @@ function updateGame() {
 		commitActions();
 		enableDayTime();
 		setLocalStorage("game", game);
+		if(game.dayTime) appendNewDayLog();
 		triggerEvents();
 		game.radios = [];
 		toggleDayTime();
@@ -200,8 +210,9 @@ function genRadioSet(time) {
 	$("#radioset" + time + " > div").hide();
 }
 function appendMessage(id) {
-	$("#dialog").prepend($(id).clone());
-	$(id).fadeIn();
+	$("#logDay" + game.day).prepend($(id).clone());
+	$(id).show();
+	$("#dialog").accordion("refresh");
 }
 
 function toggleDayTime() {
@@ -239,6 +250,15 @@ function disableDayTime() {
 		$("#radioset" + game.disabledDayTime).buttonset({disabled:true})
 		game.activity[game.disabledDayTime] = "_.id";
 	}
+}
+
+function appendNewDayLog() {
+	var content = $("<div>")
+		.attr("id", "logDay" + game.day);
+	$("#dialog").prepend(content);
+	$("#dialog").prepend($("<h3>").html("Day: " + game.day));
+	$("#dialog").accordion("refresh");
+	$("#dialog").accordion({ active: 0 });
 }
 
 /*Fade with no display:none*/

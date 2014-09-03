@@ -2,12 +2,6 @@ function setTriggers() {
 	game.triggers = [
 new trigger(
 	function () {
-		return game.dayTime;
-	}, function () {
-		appendMessage("<div class='day-counter'>Day: " + game.day + "</div><hr/>");
-	}
-), new trigger(
-	function () {
 		return game.day == 0;
 	}, function () {
 		appendMessage("#day0night");
