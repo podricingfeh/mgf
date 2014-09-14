@@ -34,19 +34,15 @@ function init() {
 		"evening" : null,
 		"night" : null
 	};
+	game.messages = [];
 	restoreSave();
 	game.radios = [];
 	setActivities();
 }
 
-function setUpDialog() {
-	$("#dialog").accordion();
-	appendNewDayLog();
-}
-
 function restoreSave() {
 	game = getLocalStorage("game", game);
-	setUpDialog();
+	$("#dialog").accordion();
 	setTriggers();
 	if(_.size(game.storage) > 0) {
 		toggleDayTime();
@@ -70,6 +66,7 @@ function restoreSave() {
 		triggerEvents();
 		startNewDay();
 	}
+	appendNewDayLog();
 	if(_.size(game.tasks) > 0) {
 		fadeIn("#progress");
 		if(game.patchedRoof) {
@@ -100,8 +97,8 @@ function firstDay() {
 }
 
 function firstDayAux() {
-	appendNewDayLog();
 	triggerEvents();
+	appendNewDayLog();
 	toggleDayTime();
 }
 
@@ -113,6 +110,10 @@ function searchFood() {
 function collectWood() {
 	changeStorageBy("wood", 3);
 	appendMessage("#collectWood");
+}
+
+function chatMelody() {
+	appendMessage("#chatMelody");
 }
 
 function changeStorageBy(item, amount) {
@@ -130,8 +131,8 @@ function updateGame() {
 		commitActions();
 		enableDayTime();
 		setLocalStorage("game", game);
-		if(game.dayTime) appendNewDayLog();
 		triggerEvents();
+		if(game.dayTime) appendNewDayLog();
 		game.radios = [];
 		toggleDayTime();
 		disableDayTime();
@@ -184,20 +185,35 @@ function addActivity(text, action, time) {
 
 function removeActivity(text) {
 	$(":radio").map(function (i, v) {
-		var b = $(v)
+		var b = $(v);
 		if(b.button('option', 'label') == text) {
 			b.button("option", "label", "");
 			b.parent().hide();
 			b.click(_.id);
 		}
 	});
-	game.activities[text] = undefined;
+	delete game.activities[text];
 }
 
 function selectActivity(ev) {
 	game.activity[ev.data.time] = ev.data.action;
 	updateGame();
 }
+
+function replaceActivity(time, title, newTitle, action) {
+	$(":radio").map(function (i, v) {
+		var b = $(v);
+		console.log(b.attr);
+		if(b.button('option', 'label') == title
+			&& b.attr("id").contains(time)) {
+			b.button("option", "label", newTitle);
+			b.click(action);
+		}
+	});
+	delete game.activities[title];
+	game.activities[newTitle] = [action, [time]];
+}
+
 function genRadioSet(time) {
 	$("#" + time).append("<form><div id='radioset" + time + "'>");
 	_.each(_.range(5), function (v) {
@@ -209,10 +225,9 @@ function genRadioSet(time) {
 	$("#radioset" + time).buttonset();
 	$("#radioset" + time + " > div").hide();
 }
-function appendMessage(id) {
-	$("#logDay" + game.day).prepend($(id).clone());
-	$(id).show();
-	$("#dialog").accordion("refresh");
+
+function appendMessage(selector) {
+	game.messages.push(selector);
 }
 
 function toggleDayTime() {
@@ -257,6 +272,12 @@ function appendNewDayLog() {
 		.attr("id", "logDay" + game.day);
 	$("#dialog").prepend(content);
 	$("#dialog").prepend($("<h3>").html("Day: " + game.day));
+	_.each(game.messages, function (s) {
+		var msg = $(s).clone();
+		content.prepend(msg);
+		msg.show();
+	});
+	game.messages = [];
 	$("#dialog").accordion("refresh");
 	$("#dialog").accordion({ active: 0 });
 }

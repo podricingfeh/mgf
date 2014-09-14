@@ -54,7 +54,6 @@ new trigger(
 		game.patchedRoof = true;
 		removeActivity("Fix roof");
 		$("#roof").parent().fadeOut();
-		appendMessage("#gameOver");
 	}
 ), new trigger(
 	function () {
@@ -77,6 +76,39 @@ new trigger(
 		addActivity("Fix roof", "fixRoof", ["evening"]);
 		fadeIn("#progress");
 		game.tasks.roof = 0;
+	}
+), new trigger(
+	function () {
+		return game.patchedRoof && game.storage.food >= 10
+			&& game.cowRecovery == undefined
+			&& game.dayTime == false;
+	}, function () {
+		appendMessage("#cowGirlFound");
+		game.cowRecovery = 0;
+	}
+), new trigger(
+	function () {
+		return game.cowRecovery < 4
+			&& game.dayTime == false;
+	}, function () {
+		if(game.storage.food > 2) {
+			changeStorageBy("food", -2);
+			game.cowRecovery++;
+		}
+		else {
+			return;
+		}
+		appendMessage("#feedCowGirl"
+			+ game.cowRecovery);
+		game.disabledDayTime = "evening";
+		if(game.cowRecovery == 4) {
+			changeStorageBy("food", 2);
+			addActivity("Talk to Melody", "chatMelody", ["evening"]);
+			removeActivity("Feed cowgirl");
+		}
+		else if(game.cowRecovery == 1) {
+				addActivity("Feed cowgirl", "_.id", ["evening"]);
+		}
 	}
 )];
 }
