@@ -1,0 +1,24 @@
+.positioned {
+	display: table-cell;
+}
+
+#activitiesPanel {
+	background-color: #0FF;
+	width: 18em;
+}
+
+#messageLog {
+	background-color: #F0F;
+	width: 27em;
+}
+
+#storagePanel {
+	background-color: #F00;
+	width: 13em;
+}
+
+#tasksPanel{
+	background-color: #0F0;
+	width: 13em;
+}
+
