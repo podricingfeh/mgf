@@ -1,24 +1,51 @@
-.positioned {
-	display: table-cell;
+body {
+	margin-top: 2em;
+	max-height: 10px;
+	overflow: hidden;
 }
 
 #activitiesPanel {
-	background-color: #0FF;
-	width: 18em;
+	width: 17em;
+	left: 30em;
 }
 
 #messageLog {
-	background-color: #F0F;
-	width: 27em;
+	left: 3em;
+	width: 24em;
+	padding-top: 0em;
+	height: 34em;
+	overflow: auto;
 }
 
 #storagePanel {
 	background-color: #F00;
-	width: 13em;
+	width: 11em;
+	left: 50em;
+	display: none;
 }
 
 #tasksPanel{
 	background-color: #0F0;
 	width: 13em;
+	left: 64em;
+	display: none;
 }
 
+.positioned {
+	position: absolute;
+	height: 33em;
+	overflow: hidden;
+	padding: 1em;
+	border: 2px black solid;
+}
+
+#messages {
+	display: none;
+}
+
+.message {
+	margin-bottom: 0.5em;
+	background-color: rgba(227, 228, 228, 1);
+	padding: 0.5em;
+	text-align: justify;
+}
